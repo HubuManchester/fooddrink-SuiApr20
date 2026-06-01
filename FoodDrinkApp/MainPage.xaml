@@ -7,9 +7,9 @@
     <Grid RowDefinitions="Auto,*">
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="{AppThemeBinding Light=#FFF1DA, Dark=#130F0C}" Offset="0.0" />
-                <GradientStop Color="{AppThemeBinding Light=#FFF9EF, Dark=#0F1711}" Offset="0.45" />
-                <GradientStop Color="{AppThemeBinding Light=#F7EFE3, Dark=#0E1511}" Offset="1.0" />
+                <GradientStop Color="{AppThemeBinding Light=#FDE8EB, Dark=#140F10}" Offset="0.0" />
+                <GradientStop Color="{AppThemeBinding Light=#FDF3F4, Dark=#101215}" Offset="0.45" />
+                <GradientStop Color="{AppThemeBinding Light=#F7ECEE, Dark=#0F1215}" Offset="1.0" />
             </LinearGradientBrush>
         </Grid.Background>
 
@@ -20,9 +20,9 @@
                 </Border.StrokeShape>
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="{AppThemeBinding Light=#D9472B, Dark=#5B2017}" Offset="0.0" />
-                        <GradientStop Color="{AppThemeBinding Light=#F29B38, Dark=#9B4A19}" Offset="0.62" />
-                        <GradientStop Color="{AppThemeBinding Light=#2F7A4F, Dark=#1D5D3A}" Offset="1.0" />
+                        <GradientStop Color="{AppThemeBinding Light=#FFBDC3, Dark=#703840}" Offset="0.0" />
+                        <GradientStop Color="{AppThemeBinding Light=#EACFE8, Dark=#504050}" Offset="0.62" />
+                        <GradientStop Color="{AppThemeBinding Light=#C6DAFA, Dark=#304060}" Offset="1.0" />
                     </LinearGradientBrush>
                 </Border.Background>
                 <Border.Shadow>
@@ -37,7 +37,7 @@
                     <Label Grid.Row="1"
                            Text="Track nutrition, flavour, photos, and meal context in one place."
                            FontSize="15"
-                           TextColor="#FFF5E8" />
+                           TextColor="#FFF0F3" />
                     <Grid Grid.Row="2" ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="0,3,0,0">
                         <Border BackgroundColor="#33FFFFFF" StrokeThickness="0" Padding="10,7">
                             <Border.StrokeShape>
@@ -60,8 +60,8 @@
                     </Grid>
                     <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="0,6,0,0">
                         <Border StrokeThickness="1"
-                                Stroke="#FFE0BA"
-                                BackgroundColor="#FFFFFA"
+                                Stroke="#E8D0D5"
+                                BackgroundColor="#FEFAFA"
                                 Padding="0">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="8" />
@@ -70,14 +70,14 @@
                                        Placeholder="Search foods, drinks, categories, or tags"
                                        TextChanged="OnSearchTextChanged"
                                        SearchButtonPressed="OnSearchButtonPressed"
-                                       TextColor="#3A2518"
-                                       PlaceholderColor="#9A7B63"
+                                       TextColor="#3D282A"
+                                       PlaceholderColor="#9A7B75"
                                        BackgroundColor="Transparent"
                                        SemanticProperties.Hint="Search the food and drink list" />
                         </Border>
                         <Button Grid.Column="1"
                                 Text="Add"
-                                BackgroundColor="#2F7A4F"
+                                BackgroundColor="#8AA5D5"
                                 TextColor="#FFFFFF"
                                 FontAttributes="Bold"
                                 Clicked="OnAddClicked"
@@ -95,8 +95,8 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:FoodItem">
                         <Border StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light=#F0D6B8, Dark=#3E3023}"
-                                BackgroundColor="{AppThemeBinding Light=#FFFFFA, Dark=#1A1712}"
+                                Stroke="{AppThemeBinding Light=#E8D0D5, Dark=#3D2E30}"
+                                BackgroundColor="{AppThemeBinding Light=#FEFAFA, Dark=#1A1516}"
                                 Padding="0"
                                 Margin="0,0,0,12">
                             <Border.StrokeShape>
@@ -106,16 +106,16 @@
                                 <Shadow Brush="#22000000" Offset="0,5" Radius="14" Opacity="0.34" />
                             </Border.Shadow>
                             <Grid ColumnDefinitions="6,*">
-                                <BoxView BackgroundColor="{AppThemeBinding Light=#D9472B, Dark=#FF7D55}" />
+                                <BoxView BackgroundColor="{AppThemeBinding Light=#FFBDC3, Dark=#FFBDC3}" />
                                 <Grid Grid.Column="1" Padding="16" RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="8" ColumnSpacing="10">
                                     <Label Text="{Binding Name}"
                                            FontSize="20"
                                            FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light=#3A2518, Dark=#FFF2DF}"
+                                           TextColor="{AppThemeBinding Light=#3D282A, Dark=#FDE8EB}"
                                            SemanticProperties.HeadingLevel="Level2" />
                                     <Border Grid.Column="1"
                                             StrokeThickness="0"
-                                            BackgroundColor="{AppThemeBinding Light=#FFF0C9, Dark=#4A3417}"
+                                            BackgroundColor="{AppThemeBinding Light=#FDE8ED, Dark=#4A2D30}"
                                             Padding="10,5">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8" />
@@ -123,29 +123,29 @@
                                         <Label Text="{Binding CaloriesLabel}"
                                                FontSize="13"
                                                FontAttributes="Bold"
-                                               TextColor="{AppThemeBinding Light=#A95517, Dark=#FFD18E}" />
+                                               TextColor="{AppThemeBinding Light=#C46070, Dark=#FFBDC3}" />
                                     </Border>
                                     <Label Grid.Row="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding Description}"
                                            FontSize="14"
-                                           TextColor="{AppThemeBinding Light=#6E5A47, Dark=#D8C4AC}"
+                                           TextColor="{AppThemeBinding Light=#6E5C58, Dark=#D4C4C8}"
                                            LineBreakMode="TailTruncation" />
                                     <Label Grid.Row="2"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding MacroSummary}"
                                            FontSize="13"
-                                           TextColor="{AppThemeBinding Light=#2F7A4F, Dark=#8CE6A1}" />
+                                           TextColor="{AppThemeBinding Light=#8AA5D5, Dark=#C6DAFA}" />
                                     <Grid Grid.Row="3" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" Margin="0,4,0,0">
                                         <Label Text="{Binding Category}"
                                                FontSize="13"
                                                FontAttributes="Bold"
-                                               TextColor="{AppThemeBinding Light=#D9472B, Dark=#FF9C7B}" />
+                                               TextColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}" />
                                         <Button Grid.Column="1"
                                                 Text="Details"
                                                 Padding="14,8"
-                                                BackgroundColor="{AppThemeBinding Light=#D9472B, Dark=#FFB15D}"
-                                                TextColor="{AppThemeBinding Light=#FFFFFF, Dark=#261307}"
+                                                BackgroundColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}"
+                                                TextColor="{AppThemeBinding Light=#FFFFFF, Dark=#2D181A}"
                                                 CommandParameter="{Binding Id}"
                                                 Clicked="OnDetailsClicked"
                                                 SemanticProperties.Hint="Open nutrition details" />
