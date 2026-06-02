@@ -28,7 +28,7 @@
                 <Border.Shadow>
                     <Shadow Brush="#33000000" Offset="0,8" Radius="18" Opacity="0.45" />
                 </Border.Shadow>
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="10">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="10">
                     <Label Text="NutriBite"
                            FontSize="31"
                            FontAttributes="Bold"
@@ -58,7 +58,24 @@
                             <Label Text="Voice" TextColor="#FFFFFF" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center" />
                         </Border>
                     </Grid>
-                    <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="0,6,0,0">
+                    <!-- 摇一摇随机推荐指示条 -->
+                    <Border x:Name="ShakeIndicator"
+                            Grid.Row="3"
+                            StrokeThickness="0"
+                            BackgroundColor="#33FFFFFF"
+                            Padding="10,7">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Label x:Name="ShakeHintLabel"
+                               Text="📳 Shake your phone to discover a random healthy recipe"
+                               TextColor="#FFFFFF"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                    </Border>
+
+                    <Grid Grid.Row="4" ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="0,6,0,0">
                         <Border StrokeThickness="1"
                                 Stroke="#E8D0D5"
                                 BackgroundColor="#FEFAFA"
