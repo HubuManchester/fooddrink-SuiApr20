@@ -61,8 +61,14 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private async Task LoadFoodItemsAsync(string? query = null)
+    private async Task LoadFoodItemsAsync(string? query = null, bool forceRefresh = false)
     {
+        // Force refresh = re-fetch from MockAPI (pull-to-refresh), then search
+        if (forceRefresh)
+        {
+            await FoodCatalogService.GetCatalogAsync(forceRefresh: true);
+        }
+
         FoodCollection.ItemsSource = await FoodCatalogService.SearchAsync(query);
     }
 
@@ -91,9 +97,10 @@ public partial class MainPage : ContentPage
 
     private async void OnRefreshing(object? sender, EventArgs e)
     {
-        await LoadFoodItemsAsync(SearchFoodBar.Text);
+        // Pull-to-refresh: force re-fetch from MockAPI to pick up latest remote data
+        await LoadFoodItemsAsync(SearchFoodBar.Text, forceRefresh: true);
         FoodRefreshView.IsRefreshing = false;
-        var source = FoodCatalogService.LastLoadUsedMockApi ? "mockapi.io" : "local fallback data";
+        var source = FoodCatalogService.LastLoadUsedMockApi ? "mockapi.io" : "local cache & fallback data";
         SemanticScreenReader.Announce($"Food and drink list refreshed. Current source: {source}.");
     }
 }
