@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Override the default MAUI-generated Maui.SplashTheme to inherit from
+        MaterialComponents. This fixes the crash on Xiaomi / MIUI devices that
+        require a valid TextAppearance attribute from the MaterialComponents family.
+    -->
+    <style name="Maui.SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color: action bar, widgets, etc. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <!-- Darker variant: status bar background -->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!-- Accent: switches, sliders, interactive highlights -->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- Status bar tint (Android 5+) -->
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <!-- Navigation bar tint (Android 5+) -->
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+    </style>
+</resources>

@@ -47,7 +47,7 @@ public partial class FoodDetailPage : ContentPage
         }
 
         NameLabel.Text = currentItem.Name;
-        CategoryLabel.Text = currentItem.Category;
+        CategoryLabel.Text = currentItem.CategoryWithEmoji;
         CaloriesLabel.Text = currentItem.CaloriesLabel;
         MacroLabel.Text = currentItem.MacroSummary;
         DescriptionLabel.Text = currentItem.Description;

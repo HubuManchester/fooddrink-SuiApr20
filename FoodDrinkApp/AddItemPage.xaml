@@ -44,11 +44,11 @@
                             Title="Category"
                             SemanticProperties.Hint="Required category">
                         <Picker.Items>
-                            <x:String>Breakfast</x:String>
-                            <x:String>Lunch</x:String>
-                            <x:String>Dinner</x:String>
-                            <x:String>Snack</x:String>
-                            <x:String>Drink</x:String>
+                            <x:String>Breakfast 🥪</x:String>
+                            <x:String>Lunch 🍛</x:String>
+                            <x:String>Dinner 🥙</x:String>
+                            <x:String>Snack 🍬</x:String>
+                            <x:String>Drink 🍹</x:String>
                         </Picker.Items>
                     </Picker>
                     <Editor x:Name="DescriptionEditor"

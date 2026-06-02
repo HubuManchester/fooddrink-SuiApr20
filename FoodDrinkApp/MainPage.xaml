@@ -137,7 +137,7 @@
                                            FontSize="13"
                                            TextColor="{AppThemeBinding Light=#8AA5D5, Dark=#C6DAFA}" />
                                     <Grid Grid.Row="3" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-                                        <Label Text="{Binding Category}"
+                                        <Label Text="{Binding CategoryWithEmoji}"
                                                FontSize="13"
                                                FontAttributes="Bold"
                                                TextColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}" />

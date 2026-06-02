@@ -31,7 +31,7 @@ public partial class AddItemPage : ContentPage
             var item = new FoodItem
             {
                 Name = NameEntry.Text!.Trim(),
-                Category = CategoryPicker.SelectedItem?.ToString() ?? "Snack",
+                Category = CategoryPicker.SelectedItem?.ToString() ?? "Snack 🍬",
                 Description = DescriptionEditor.Text!.Trim(),
                 Calories = calories,
                 Protein = protein,
