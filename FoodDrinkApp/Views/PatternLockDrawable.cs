@@ -13,7 +13,7 @@ namespace FoodDrinkApp.Views;
 public class PatternLockDrawable : IDrawable
 {
     private const int GridSize = 3;
-    private const float DotRadiusFraction = 0.042f;   // 圆点半径占画布宽度的比例
+    private const float DotRadiusFraction = 0.042f;   // 圆点半径占网格正方形边长的比例
     private const float LineWidth = 6f;
     private const float TrailDashLength = 8f;
 
@@ -35,22 +35,44 @@ public class PatternLockDrawable : IDrawable
     public Color ErrorColor { get; set; } = Color.FromArgb("#E04040");
 
     /// <summary>
+    /// 计算九宫格布局指标：以画布短边为基准构建正方形网格，并居中。
+    /// 平板等宽屏设备上画布宽度远大于高度，若按宽度计算 padding
+    /// 会挤占全部纵向空间，导致圆点堆叠变形。改用 Math.Min 保证
+    /// 网格始终为正方形，避免宽屏比例失调。
+    /// </summary>
+    private static (float squareSize, float padding, float offsetX, float offsetY) GetGridMetrics(
+        float canvasWidth, float canvasHeight)
+    {
+        float squareSize = Math.Min(canvasWidth, canvasHeight);
+        float padding = squareSize * 0.15f;
+        float offsetX = (canvasWidth - squareSize) / 2f + padding;
+        float offsetY = (canvasHeight - squareSize) / 2f + padding;
+        return (squareSize, padding, offsetX, offsetY);
+    }
+
+    /// <summary>
+    /// 返回网格正方形边长，供 Draw / HitTest 统一计算圆点半径。
+    /// </summary>
+    public static float GetGridSquareSize(float canvasWidth, float canvasHeight)
+    {
+        return Math.Min(canvasWidth, canvasHeight);
+    }
+
+    /// <summary>
     /// 计算第 index 个圆点在画布上的中心坐标（索引 0-8，3×3 布局）。
     /// </summary>
     public static PointF GetDotCenter(int index, float canvasWidth, float canvasHeight)
     {
-        float padding = canvasWidth * 0.15f;
-        float usableWidth = canvasWidth - padding * 2;
-        float usableHeight = canvasHeight - padding * 2;
-        float cellWidth = usableWidth / (GridSize - 1);
-        float cellHeight = usableHeight / (GridSize - 1);
+        var (squareSize, padding, offsetX, offsetY) = GetGridMetrics(canvasWidth, canvasHeight);
+        float usableSize = squareSize - padding * 2;
+        float cellSize = usableSize / (GridSize - 1);
 
         int row = index / GridSize;
         int col = index % GridSize;
 
         return new PointF(
-            padding + col * cellWidth,
-            padding + row * cellHeight
+            offsetX + col * cellSize,
+            offsetY + row * cellSize
         );
     }
 
@@ -59,7 +81,8 @@ public class PatternLockDrawable : IDrawable
     /// </summary>
     public static int? HitTest(PointF touchPoint, float canvasWidth, float canvasHeight)
     {
-        float radius = canvasWidth * DotRadiusFraction;
+        float squareSize = GetGridSquareSize(canvasWidth, canvasHeight);
+        float radius = squareSize * DotRadiusFraction;
         float hitThreshold = radius * 2.2f; // 容错范围：略大于圆点本身
 
         for (int i = 0; i < GridSize * GridSize; i++)
@@ -78,7 +101,8 @@ public class PatternLockDrawable : IDrawable
     {
         float w = dirtyRect.Width;
         float h = dirtyRect.Height;
-        float radius = w * DotRadiusFraction;
+        float squareSize = GetGridSquareSize(w, h);
+        float radius = squareSize * DotRadiusFraction;
 
         var lineColor = IsErrorState ? ErrorColor : LineColor;
         var selectedFill = IsErrorState ? ErrorColor : SelectedFillColor;
