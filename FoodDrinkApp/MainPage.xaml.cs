@@ -69,6 +69,9 @@ public partial class MainPage : ContentPage
             await FoodCatalogService.GetCatalogAsync(forceRefresh: true);
         }
 
+        // Null-reset before reassigning forces CollectionView to fully rebind,
+        // ensuring newly added items are rendered even if the list reference changed.
+        FoodCollection.ItemsSource = null;
         FoodCollection.ItemsSource = await FoodCatalogService.SearchAsync(query);
     }
 

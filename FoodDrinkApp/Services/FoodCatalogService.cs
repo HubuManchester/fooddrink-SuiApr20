@@ -236,7 +236,10 @@ public static class FoodCatalogService
 
         if (string.IsNullOrWhiteSpace(query))
         {
-            return _cachedItems;
+            // Return a NEW list copy — never the original reference.
+            // CollectionView uses reference equality to skip rebinding;
+            // returning the same List<T> instance causes new items to be invisible.
+            return new List<FoodItem>(_cachedItems);
         }
 
         var lowerQuery = query.ToLowerInvariant();
