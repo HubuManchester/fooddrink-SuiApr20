@@ -110,14 +110,82 @@
                         SemanticProperties.Hint="Stop current speech" />
             </Grid>
 
-            <Button Text="Haptic feedback"
+            <!-- ═══ 九宫格手势解锁 + 触觉反馈 ═══ -->
+            <Border StrokeThickness="1"
+                    Stroke="{AppThemeBinding Light=#E8D0D5, Dark=#3D2E30}"
                     BackgroundColor="{AppThemeBinding Light=#FEFAFA, Dark=#1A1516}"
-                    BorderColor="{AppThemeBinding Light=#E8D0D5, Dark=#3D2E30}"
-                    BorderWidth="1"
-                    TextColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}"
-                    Clicked="OnFeedbackClicked"
-                    SemanticProperties.Hint="Trigger vibration and haptic feedback" />
+                    Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Gesture pattern"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}" />
+                            <Label Text="Drag across the dots. Each one triggers precise haptic feedback."
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light=#8A6E6E, Dark=#D4C4C8}" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1"
+                                x:Name="ResetPatternButton"
+                                Text="Reset"
+                                FontSize="13"
+                                Padding="14,8"
+                                BackgroundColor="{AppThemeBinding Light=#FDE8ED, Dark=#3D2E30}"
+                                TextColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}"
+                                BorderColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}"
+                                BorderWidth="1"
+                                Clicked="OnResetPatternClicked"
+                                IsEnabled="False"
+                                SemanticProperties.Hint="Clear the gesture pattern" />
+                    </Grid>
 
+                    <!-- 3×3 九宫格画布 -->
+                    <Border StrokeThickness="0"
+                            BackgroundColor="{AppThemeBinding Light=#FDF3F4, Dark=#181415}"
+                            HeightRequest="300"
+                            HorizontalOptions="Fill">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <GraphicsView x:Name="PatternLockView"
+                                      HorizontalOptions="Fill"
+                                      VerticalOptions="Fill"
+                                      StartInteraction="OnPatternStartInteraction"
+                                      DragInteraction="OnPatternDragInteraction"
+                                      EndInteraction="OnPatternEndInteraction" />
+                    </Border>
+
+                    <!-- 实时状态面板 -->
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Border StrokeThickness="0"
+                                BackgroundColor="{AppThemeBinding Light=#D97080, Dark=#FFBDC3}"
+                                Padding="10,6"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="6" />
+                            </Border.StrokeShape>
+                            <Label x:Name="PatternSequenceLabel"
+                                   Text="—"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#FFFFFF"
+                                   HorizontalTextAlignment="Center" />
+                        </Border>
+                        <Label x:Name="PatternHapticLabel"
+                               Grid.Column="1"
+                               Text="Draw a pattern to feel haptic feedback on each dot."
+                               FontSize="13"
+                               VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light=#8A6E6E, Dark=#D4C4C8}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- 状态栏（精简为全局状态提示） -->
             <Border StrokeThickness="0"
                     BackgroundColor="{AppThemeBinding Light=#FDE8ED, Dark=#302025}"
                     Padding="14">
@@ -130,7 +198,7 @@
                            FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light=#C46070, Dark=#FFBDC3}" />
                     <Label x:Name="FeedbackCountLabel"
-                           Text="Haptic feedback tests: 0"
+                           Text="Dot touches this session: 0"
                            FontSize="13"
                            TextColor="{AppThemeBinding Light=#6E5C58, Dark=#D4C4C8}" />
                 </VerticalStackLayout>

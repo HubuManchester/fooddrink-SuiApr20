@@ -1,14 +1,19 @@
 using FoodDrinkApp.Services;
+using FoodDrinkApp.Views;
 
 namespace FoodDrinkApp;
 
 public partial class HardwarePage : ContentPage
 {
     private int feedbackTestCount;
+    private readonly PatternLockDrawable _patternDrawable = new();
+    private readonly List<int> _visitedDots = new();
+    private int? _lastHapticDot; // 上一次触发触觉反馈的圆点，避免重复触发
 
     public HardwarePage()
     {
         InitializeComponent();
+        PatternLockView.Drawable = _patternDrawable;
     }
 
     protected override void OnAppearing()
@@ -174,20 +179,142 @@ public partial class HardwarePage : ContentPage
         SetStatus("Reading stopped.");
     }
 
-    private void OnFeedbackClicked(object? sender, EventArgs e)
+    // ═══════════════════════════════════════════════
+    //  九宫格手势解锁 + 触觉反馈 事件处理
+    // ═══════════════════════════════════════════════
+
+    /// <summary>
+    /// 手指按下：命中第一个圆点，触发首次触觉反馈。
+    /// </summary>
+    private void OnPatternStartInteraction(object? sender, TouchEventArgs e)
+    {
+        _patternDrawable.IsErrorState = false;
+        _visitedDots.Clear();
+        _lastHapticDot = null;
+
+        var touch = e.Touches.FirstOrDefault();
+        ProcessTouchPoint(touch);
+    }
+
+    /// <summary>
+    /// 手指滑动：沿途每进入一个新的圆点，触发一次 HapticFeedbackType.Click。
+    /// 这是九宫格手势触觉反馈的核心——手指划过多远就触发多少次。
+    /// </summary>
+    private void OnPatternDragInteraction(object? sender, TouchEventArgs e)
+    {
+        var touch = e.Touches.FirstOrDefault();
+        ProcessTouchPoint(touch);
+
+        // 更新拖尾位置（从最后一个已访问圆点连到手指当前位置）
+        _patternDrawable.CurrentTouchPoint = touch;
+        PatternLockView.Invalidate();
+    }
+
+    /// <summary>
+    /// 手指抬起：锁定图案，显示序列结果。
+    /// </summary>
+    private void OnPatternEndInteraction(object? sender, TouchEventArgs e)
+    {
+        _patternDrawable.CurrentTouchPoint = null;
+        PatternLockView.Invalidate();
+
+        if (_visitedDots.Count == 0)
+        {
+            PatternSequenceLabel.Text = "—";
+            PatternHapticLabel.Text = "No dots were touched. Try dragging across the grid.";
+            return;
+        }
+
+        // 构造形如 "1 → 4 → 7 → 8" 的序列字符串
+        var sequence = string.Join(" → ", _visitedDots.ConvertAll(d => (d + 1).ToString()));
+        PatternSequenceLabel.Text = sequence;
+        PatternHapticLabel.Text = _visitedDots.Count == 1
+            ? "Only 1 dot touched — try a longer swipe for richer haptic feedback."
+            : $"Unlocked! {_visitedDots.Count} dot{(_visitedDots.Count > 1 ? "s" : "")} touched, each with haptic click feedback.";
+
+        ResetPatternButton.IsEnabled = true;
+        SetStatus($"Pattern unlocked — {_visitedDots.Count} dots, {feedbackTestCount} total touches this session.");
+        SemanticScreenReader.Announce($"Gesture pattern completed with {_visitedDots.Count} dot touches.");
+    }
+
+    /// <summary>
+    /// 处理单个触摸点：命中圆点时记录并触发触觉反馈。
+    /// </summary>
+    private void ProcessTouchPoint(PointF? touch)
+    {
+        if (touch is null) return;
+
+        // GraphicsView 的坐标需要通过 Invalidate 重新获取实际画布尺寸
+        float w = (float)PatternLockView.Width;
+        float h = (float)PatternLockView.Height;
+        if (w <= 0 || h <= 0) return;
+
+        int? hitIndex = PatternLockDrawable.HitTest(touch.Value, w, h);
+
+        if (hitIndex.HasValue && !_visitedDots.Contains(hitIndex.Value))
+        {
+            // ── 进入新圆点：触发触觉反馈 ──
+            _visitedDots.Add(hitIndex.Value);
+            _patternDrawable.VisitedIndices = new List<int>(_visitedDots);
+
+            // 只在首次进入该圆点时触发触觉反馈（避免拖拽停留时重复触发）
+            if (_lastHapticDot != hitIndex.Value)
+            {
+                _lastHapticDot = hitIndex.Value;
+                TriggerDotHaptic();
+            }
+
+            PatternLockView.Invalidate();
+
+            // 实时更新序列预览
+            var preview = string.Join(" → ", _visitedDots.ConvertAll(d => (d + 1).ToString()));
+            PatternSequenceLabel.Text = preview;
+            PatternHapticLabel.Text = $"Dot {hitIndex.Value + 1} touched — haptic click fired.";
+        }
+        else
+        {
+            // 手指离开圆点范围时重置 lastHapticDot，
+            // 保证再划回来时能重新触发触觉反馈
+            if (!hitIndex.HasValue)
+                _lastHapticDot = null;
+        }
+    }
+
+    /// <summary>
+    /// 触发单次圆点触觉反馈。
+    /// 使用 HapticFeedbackType.Click —— 最细腻、最快速的物理回馈，
+    /// 非常适合手指快速划过多个圆点时的连续触发场景。
+    /// </summary>
+    private void TriggerDotHaptic()
     {
         try
         {
-            Vibration.Default.Vibrate(TimeSpan.FromMilliseconds(450));
-            HapticFeedback.Default.Perform(HapticFeedbackType.LongPress);
+            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
             feedbackTestCount++;
-            FeedbackCountLabel.Text = $"Haptic feedback tests: {feedbackTestCount}";
-            SetStatus("Vibration and haptic feedback triggered. The changing counter can be used for screen-recorded verification.");
+            FeedbackCountLabel.Text = $"Dot touches this session: {feedbackTestCount}";
         }
         catch (Exception ex)
         {
-            SetStatus($"Feedback error: {ex.Message}");
+            SetStatus($"Haptic feedback unavailable: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// 重置九宫格图案。
+    /// </summary>
+    private void OnResetPatternClicked(object? sender, EventArgs e)
+    {
+        _visitedDots.Clear();
+        _lastHapticDot = null;
+        _patternDrawable.VisitedIndices = new List<int>();
+        _patternDrawable.CurrentTouchPoint = null;
+        _patternDrawable.IsErrorState = false;
+        PatternLockView.Invalidate();
+
+        PatternSequenceLabel.Text = "—";
+        PatternHapticLabel.Text = "Draw a pattern to feel haptic feedback on each dot.";
+        ResetPatternButton.IsEnabled = false;
+        SetStatus("Pattern cleared. Draw a new gesture to trigger haptic feedback.");
     }
 
     private void SetStatus(string message)
