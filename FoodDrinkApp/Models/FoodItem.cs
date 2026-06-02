@@ -1,9 +1,15 @@
 using System.Text.Json.Serialization;
+using SQLite;
 
 namespace FoodDrinkApp.Models;
 
+/// <summary>
+/// Food/drink data model. Supports both JSON (MockAPI) and SQLite (local database).
+/// </summary>
+[Table("foods")]
 public sealed class FoodItem
 {
+    [PrimaryKey]
     [JsonPropertyName("id")]
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
@@ -34,9 +40,11 @@ public sealed class FoodItem
     [JsonPropertyName("tags")]
     public string Tags { get; set; } = string.Empty;
 
+    [Ignore]
     [JsonIgnore]
     public string CaloriesLabel => $"{Calories} kcal";
 
+    [Ignore]
     [JsonIgnore]
     public string MacroSummary => $"Protein {Protein}g, carbs {Carbs}g, fat {Fat}g";
 
@@ -44,9 +52,11 @@ public sealed class FoodItem
     /// 动态映射：无论后端数据是纯文本（如"Breakfast"）还是已带 Emoji（如"Breakfast 🥪"），
     /// 统一返回带 Emoji 的显示字符串，兼容大小写。
     /// </summary>
+    [Ignore]
     [JsonIgnore]
     public string CategoryWithEmoji => MapCategoryToEmoji(Category);
 
+    [Ignore]
     [JsonIgnore]
     public string AccessibleSummary => $"{Name}. {Category}. {Calories} kcal. {MacroSummary}. {AllergyNote}";
 

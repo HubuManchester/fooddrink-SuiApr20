@@ -8,8 +8,23 @@ public partial class App : Application
 	{
 		InitializeComponent();
 
-		// 清除旧缓存：首次启动时清理残留的 50 条旧 MockAPI 数据，
-		// 下次 GetCatalogAsync 会从 MockAPI 重新拉取最新的 6 条数据。
+		// Migrate from old JSON-file cache to SQLite database.
+		// Delete the legacy cache file if it still exists.
+		try
+		{
+			var legacyCachePath = Path.Combine(FileSystem.AppDataDirectory, "food_catalog_cache.json");
+			if (File.Exists(legacyCachePath))
+			{
+				File.Delete(legacyCachePath);
+			}
+		}
+		catch
+		{
+			// Best-effort migration
+		}
+
+		// Clear stale SQLite data on first launch after the architecture change.
+		// This ensures the old 50-item JSON cache doesn't persist in any form.
 		FoodCatalogService.ClearCache();
 	}
 

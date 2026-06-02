@@ -58,7 +58,7 @@
                             <Label Text="Voice" TextColor="#FFFFFF" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center" />
                         </Border>
                     </Grid>
-                    <!-- 摇一摇随机推荐指示条 -->
+                    <!-- 摇一摇随机推荐指示条 + 数据源状态 -->
                     <Border x:Name="ShakeIndicator"
                             Grid.Row="3"
                             StrokeThickness="0"
@@ -67,12 +67,21 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
-                        <Label x:Name="ShakeHintLabel"
-                               Text="📳 Shake your phone to discover a random healthy recipe"
-                               TextColor="#FFFFFF"
-                               FontSize="12"
-                               FontAttributes="Bold"
-                               HorizontalTextAlignment="Center" />
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="3">
+                            <Label x:Name="ShakeHintLabel"
+                                   Text="📳 Shake your phone to discover a random healthy recipe"
+                                   TextColor="#FFFFFF"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" />
+                            <Label x:Name="DataSourceLabel"
+                                   Grid.Row="1"
+                                   Text="Data source: initializing..."
+                                   TextColor="#FFFFFF"
+                                   FontSize="10"
+                                   HorizontalTextAlignment="Center"
+                                   Opacity="0.8" />
+                        </Grid>
                     </Border>
 
                     <Grid Grid.Row="4" ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="0,6,0,0">

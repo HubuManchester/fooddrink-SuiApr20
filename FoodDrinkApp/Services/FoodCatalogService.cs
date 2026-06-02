@@ -21,12 +21,20 @@ public static class FoodCatalogService
         PropertyNameCaseInsensitive = true
     };
 
-    // ���س־û������ļ�·��
-    private static readonly string LocalCacheFilePath = Path.Combine(FileSystem.AppDataDirectory, MockApiConfig.LocalCacheFileName);
+    // SQLite local database — replaces the old JSON file cache
+    private static readonly FoodDatabase Database = FoodDatabase.Instance;
 
     private static List<FoodItem> _cachedItems = new();
 
     public static bool LastLoadUsedMockApi { get; private set; }
+
+    /// <summary>
+    /// Returns a human-readable description of the current data source,
+    /// for the demo video / debug display.
+    /// </summary>
+    public static string DataSourceDescription => LastLoadUsedMockApi
+        ? "MockAPI (remote) + SQLite (local)"
+        : "SQLite (local database)";
 
     /// <summary>
     /// Normalize category strings from MockAPI (e.g. "Drinks" -> "Drink")
@@ -164,7 +172,7 @@ public static class FoodCatalogService
         // ── Step 1: Load from local persistent cache (the "database" layer) ──
         if (_cachedItems.Count == 0)
         {
-            LoadFromLocalFile();
+            await LoadFromDatabaseAsync();
         }
 
         // ── Step 2: Attempt MockAPI fetch (remote data source) ──
@@ -191,7 +199,7 @@ public static class FoodCatalogService
                     _cachedItems.AddRange(localOnlyItems);
 
                     LastLoadUsedMockApi = true;
-                    SaveToLocalFile();
+                    await SaveToDatabaseAsync();
                     return _cachedItems;
                 }
             }
@@ -205,7 +213,7 @@ public static class FoodCatalogService
         if (_cachedItems.Count == 0)
         {
             _cachedItems = new List<FoodItem>(LocalFallbackItems);
-            SaveToLocalFile();
+            await SaveToDatabaseAsync();
         }
 
         return _cachedItems;
@@ -286,61 +294,60 @@ public static class FoodCatalogService
         }
 
         _cachedItems.Add(item);
-        SaveToLocalFile();
+        await SaveToDatabaseAsync();
 
         return item;
     }
 
-    private static void SaveToLocalFile()
+    /// <summary>
+    /// Persist all in-memory items to the SQLite database.
+    /// Uses insert-or-replace semantics: existing rows (matched by Id) are updated.
+    /// </summary>
+    private static async Task SaveToDatabaseAsync()
     {
         try
         {
-            var json = JsonSerializer.Serialize(_cachedItems, JsonOptions);
-            File.WriteAllText(LocalCacheFilePath, json);
+            foreach (var item in _cachedItems)
+            {
+                await Database.InsertOrReplaceAsync(item);
+            }
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[FoodCatalogService] DB save error: {ex.Message}");
         }
     }
 
-    private static void LoadFromLocalFile()
+    /// <summary>
+    /// Load all persisted items from the SQLite database into memory.
+    /// </summary>
+    private static async Task LoadFromDatabaseAsync()
     {
         try
         {
-            if (File.Exists(LocalCacheFilePath))
+            var items = await Database.GetAllAsync();
+            if (items.Count > 0)
             {
-                var json = File.ReadAllText(LocalCacheFilePath);
-                var items = JsonSerializer.Deserialize<List<FoodItem>>(json, JsonOptions);
-                if (items != null)
-                {
-                    _cachedItems = items;
-                }
+                _cachedItems = items;
             }
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[FoodCatalogService] DB load error: {ex.Message}");
             _cachedItems = new List<FoodItem>();
         }
     }
 
     /// <summary>
-    /// Clears the local cache file and in-memory cache.
-    /// Useful when MockAPI data count has changed and stale cached data
-    /// (e.g. 50 items from a previous fetch) needs to be purged.
-    ///
-    /// Call this once during app startup or from a debug button to
-    /// force a clean re-fetch from MockAPI on next GetCatalogAsync().
+    /// Clears the SQLite database and in-memory cache.
+    /// Used on first launch to purge stale JSON-file caches from previous app versions.
     /// </summary>
     public static void ClearCache()
     {
         _cachedItems.Clear();
-
         try
         {
-            if (File.Exists(LocalCacheFilePath))
-            {
-                File.Delete(LocalCacheFilePath);
-            }
+            Database.ClearAllAsync().ConfigureAwait(false);
         }
         catch
         {

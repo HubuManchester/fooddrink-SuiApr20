@@ -16,6 +16,7 @@ public partial class MainPage : ContentPage
         base.OnAppearing();
         AccessibilityService.ApplyFontScale(this);
         await LoadFoodItemsAsync(SearchFoodBar.Text);
+        UpdateDataSourceLabel();
         ShakeService.Start();
     }
 
@@ -103,7 +104,17 @@ public partial class MainPage : ContentPage
         // Pull-to-refresh: force re-fetch from MockAPI to pick up latest remote data
         await LoadFoodItemsAsync(SearchFoodBar.Text, forceRefresh: true);
         FoodRefreshView.IsRefreshing = false;
+        UpdateDataSourceLabel();
         var source = FoodCatalogService.LastLoadUsedMockApi ? "mockapi.io" : "local cache & fallback data";
         SemanticScreenReader.Announce($"Food and drink list refreshed. Current source: {source}.");
+    }
+
+    /// <summary>
+    /// Updates the on-screen data source indicator for demo video purposes.
+    /// Shows whether the app is using MockAPI+SQLite or SQLite only.
+    /// </summary>
+    private void UpdateDataSourceLabel()
+    {
+        DataSourceLabel.Text = $"Data source: {FoodCatalogService.DataSourceDescription}";
     }
 }
